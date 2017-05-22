@@ -1,9 +1,7 @@
 package UI;
 
-import java.awt.GridLayout;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.security.KeyStore.PasswordProtection;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -11,23 +9,24 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 
-public class LoginUI extends JFrame {
+public class SignUpUI extends JFrame{
 	private JTextField userText;
 	private JTextField passwordText;
-	private JButton loginButton;
 	private JButton	registerButton;
 	
-	public LoginUI(String s) {
+	public SignUpUI(String s) {
 		super(s);
 		this.setSize(640, 320);
 		this.initializeUI();
 		this.setVisible(true);
 	}
+
 	private void initializeUI() {
 		JPanel panel = new JPanel();
 		this.placeComponents(panel);
 		this.add(panel);
 	}
+	
 	private void placeComponents(JPanel panel) {
 		panel.setLayout(null);
 		
@@ -46,10 +45,6 @@ public class LoginUI extends JFrame {
 		passwordText = new JTextField();
 		passwordText.setBounds(100, 60, 200, 35);
 		panel.add(passwordText);
-		
-		loginButton = new JButton("login");
-		loginButton.setBounds(10, 120, 80, 25);
-		panel.add(loginButton);
 		
 		registerButton = new JButton("register");
 		registerButton.setBounds(120, 120, 80, 25);
