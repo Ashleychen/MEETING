@@ -38,6 +38,7 @@ public class BookingUI extends Panel{
 	private JLabel endHourLabel;
 	private JSpinner endMinuteSpinner;
 	private JLabel endMinuteLabel;
+	private JButton submitButton;
 	
 	public BookingUI(String organizerName, int personNum, Date startDate) {
 		super();
@@ -110,12 +111,36 @@ public class BookingUI extends Panel{
 		startHourLabel.setBounds(190, 310, 80, 25);
 		this.add(startHourLabel);
 		
-		startMinuteSpinner = new JSpinner(hourSpinnerModel);
-		startHourSpinner.setBounds(100, 310, 80, 25);
+		startMinuteSpinner = new JSpinner(minuteSpinnerModel);
+		startMinuteSpinner.setBounds(280, 310, 80, 25);
 		this.add(startHourSpinner);
 		
-		startHourLabel = new JLabel("时");
-		startHourLabel.setBounds(190, 310, 80, 25);
-		this.add(startHourLabel);
+		startMinuteLabel = new JLabel("分");
+		startHourLabel.setBounds(370, 310, 80, 25);
+		this.add(startMinuteLabel);
+		
+		endTimeLabel = new JLabel("结束时间");
+		endTimeLabel.setBounds(10, 345, 80, 25);
+		this.add(endTimeLabel);
+		
+		endHourSpinner = new JSpinner(hourSpinnerModel);
+		endHourSpinner.setBounds(100, 345, 80, 25);
+		this.add(endHourSpinner);
+		
+		endHourLabel = new JLabel("时");
+		endHourLabel.setBounds(190, 345, 80, 25);
+		this.add(endHourLabel);
+		
+		endMinuteSpinner = new JSpinner(minuteSpinnerModel);
+		endMinuteSpinner.setBounds(280, 345, 80, 25);
+		this.add(endMinuteSpinner);
+		
+		endMinuteLabel = new JLabel("分");
+		endMinuteLabel.setBounds(370, 345, 80, 25);
+		this.add(endMinuteLabel);
+		
+		submitButton = new JButton("提交");
+		submitButton.setBounds(1100, 900, 80, 25);
+		this.add(submitButton);
 	}
 }
