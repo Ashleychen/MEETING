@@ -15,10 +15,10 @@ public class BlockUI extends JPanel {
 	private JLabel positionLabel;
 	private JPanel listPanel;
 	
-	public BlockUI (String roomName, String personNumStr, String roomSizeStr, String positionStr) {
+	public BlockUI (String roomName, int personNum, String roomSizeStr, String positionStr) {
 		mapButton = new JButton(roomName);
 		
-		personNumLabel = new JLabel(personNumStr);
+		personNumLabel = new JLabel(Integer.toString(personNum));
 		
 		roomSizeLabel = new JLabel(roomSizeStr);
 		
