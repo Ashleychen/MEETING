@@ -1,6 +1,6 @@
 package UI;
 
-import java.sql.Date;
+import java.util.Date;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -15,7 +15,9 @@ public class BlockCellUI extends JPanel {
 	
 	public BlockCellUI(Date startTime, Date endTime, String userName) {
 		DateFormat dateFormat = new SimpleDateFormat("HH:mm");
-		timeLabel = new JLabel(timeStr);
+		String startTimeStr = dateFormat.format(startTime);
+		String endTimeStr = dateFormat.format(endTime);
+		timeLabel = new JLabel(startTimeStr + "-" + endTimeStr);
 		timeLabel.setBounds(5, 5, 80, 25);
 		this.add(timeLabel);
 		

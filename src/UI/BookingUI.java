@@ -1,12 +1,15 @@
 package UI;
 
+import java.awt.Color;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
+import javax.swing.JFormattedTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
@@ -14,12 +17,14 @@ import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.JXDatePicker;
 
 public class BookingUI extends Panel{
 	private JLabel organizerNameLabel;
-	private JTextField organizerNameTextField;
+	private JLabel organizerNameTextLabel;
 	private JLabel topicLabel;
 	private JTextArea topicTextArea;
 	private JScrollPane topicScrollPane;
@@ -40,6 +45,10 @@ public class BookingUI extends Panel{
 	private JLabel endMinuteLabel;
 	private JButton submitButton;
 	
+	private String topicText;
+	private int memberNum;
+	private Date bookingDate;
+	
 	public BookingUI(String organizerName, int personNum, Date startDate) {
 		super();
 		
@@ -47,15 +56,15 @@ public class BookingUI extends Panel{
 		organizerNameLabel.setBounds(10, 20, 80, 25);
 		this.add(organizerNameLabel);
 		
-		organizerNameTextField = new JTextField(organizerName);
-		organizerNameTextField.setBounds(100, 20, 200, 35);
-		this.add(organizerNameTextField);
+		organizerNameTextLabel = new JLabel(organizerName);
+		organizerNameTextLabel.setBounds(100, 20, 200, 35);
+		this.add(organizerNameTextLabel);
 		
 		topicLabel = new JLabel("会议主题");
 		topicLabel.setBounds(10, 45, 80, 25);
 		this.add(topicLabel);
 		
-		topicTextArea = new JTextArea("请填写会议用途！");
+		topicTextArea = new JTextArea("请填写会议用途！", 7, 15);
 		topicTextArea.setLineWrap(true);
 		topicScrollPane = new JScrollPane(topicTextArea);
 		topicScrollPane.setBounds(100, 45, 300, 200);
@@ -66,15 +75,38 @@ public class BookingUI extends Panel{
 		this.add(personNumLabel);
 		
 		SpinnerNumberModel personNumSpinnerModel = new SpinnerNumberModel(personNum, 1, personNum, 1);
+		memberNum = personNum;
 		personNumSpinner = new JSpinner(personNumSpinnerModel);
 		personNumSpinner.setBounds(100, 255, 80, 25);
+		JFormattedTextField formattedTextField = ((JSpinner.DefaultEditor)personNumSpinner.getEditor()).getTextField();
+		formattedTextField.setEditable(false);
+		formattedTextField.setBackground(Color.white);
+		personNumSpinner.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				memberNum = (int)(e.getSource());
+			}
+		});
 		
 		startDateLabel = new JLabel("开始日期");
 		startDateLabel.setBounds(10, 260, 80, 25);
 		this.add(startDateLabel);
 		
+		int minHour = 8;
+		int maxHour = 19;
+		int minMinute = 0;
+		int maxMinute = 59;
+		
+		Calendar day = Calendar.getInstance();
+		day.setTime(startDate);
+		day.set(Calendar.HOUR_OF_DAY, 0);
+		day.set(Calendar.MINUTE, 0);
+		day.set(Calendar.SECOND, 0);
+		bookingDate = day.getTime();
 		startDatePicker = new JXDatePicker();
-		startDatePicker.setDate(startDate);
+		startDatePicker.setDate(bookingDate);
 		startDatePicker.setBounds(100, 260, 118, 39);
 		this.add(startDatePicker);
 		
@@ -86,7 +118,12 @@ public class BookingUI extends Panel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				Date d = startDatePicker.getDate();
+				Calendar day = Calendar.getInstance();
+				day.setTime(startDatePicker.getDate());
+				day.set(Calendar.HOUR_OF_DAY, 0);
+				day.set(Calendar.MINUTE, 0);
+				day.set(Calendar.SECOND, 0);
+				bookingDate = day.getTime();
 				//JOptionPane.showMessageDialog(this, "获取控件中的日期 :" + d);
 			}
 		});
@@ -95,18 +132,20 @@ public class BookingUI extends Panel{
 		startTimeLabel.setBounds(10, 310, 80, 25);
 		this.add(startTimeLabel);
 		
-		int minHour = 8;
-		int maxHour = 19;
 		SpinnerNumberModel hourSpinnerModel = new SpinnerNumberModel(minHour, minHour, maxHour, 1);
-		
-		int minMinute = 0;
-		int maxMinute = 59;
 		SpinnerNumberModel minuteSpinnerModel = new SpinnerNumberModel(minMinute, minMinute, maxMinute, 1);
 		
 		startHourSpinner = new JSpinner(hourSpinnerModel);
 		startHourSpinner.setBounds(100, 310, 80, 25);
 		this.add(startHourSpinner);
-		
+		startHourSpinner.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		startHourLabel = new JLabel("时");
 		startHourLabel.setBounds(190, 310, 80, 25);
 		this.add(startHourLabel);
@@ -114,7 +153,14 @@ public class BookingUI extends Panel{
 		startMinuteSpinner = new JSpinner(minuteSpinnerModel);
 		startMinuteSpinner.setBounds(280, 310, 80, 25);
 		this.add(startHourSpinner);
-		
+		startMinuteSpinner.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		startMinuteLabel = new JLabel("分");
 		startHourLabel.setBounds(370, 310, 80, 25);
 		this.add(startMinuteLabel);
@@ -126,7 +172,14 @@ public class BookingUI extends Panel{
 		endHourSpinner = new JSpinner(hourSpinnerModel);
 		endHourSpinner.setBounds(100, 345, 80, 25);
 		this.add(endHourSpinner);
-		
+		endHourSpinner.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		endHourLabel = new JLabel("时");
 		endHourLabel.setBounds(190, 345, 80, 25);
 		this.add(endHourLabel);
@@ -134,7 +187,14 @@ public class BookingUI extends Panel{
 		endMinuteSpinner = new JSpinner(minuteSpinnerModel);
 		endMinuteSpinner.setBounds(280, 345, 80, 25);
 		this.add(endMinuteSpinner);
-		
+		endMinuteSpinner.addChangeListener(new ChangeListener() {
+			
+			@Override
+			public void stateChanged(ChangeEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 		endMinuteLabel = new JLabel("分");
 		endMinuteLabel.setBounds(370, 345, 80, 25);
 		this.add(endMinuteLabel);
@@ -142,5 +202,13 @@ public class BookingUI extends Panel{
 		submitButton = new JButton("提交");
 		submitButton.setBounds(1100, 900, 80, 25);
 		this.add(submitButton);
+		submitButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
 	}
 }

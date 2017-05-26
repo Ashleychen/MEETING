@@ -106,4 +106,11 @@ public class DataController {
 		return meetingList;
 	}
 	
+	public String getNotice() throws SQLException {
+		String sql = "select * from notice";
+		Statement statement = dbConnection.createStatement();
+		ResultSet resultSet = statement.executeQuery(sql);
+		resultSet.last();
+		return resultSet.getString("context");
+	}
 }

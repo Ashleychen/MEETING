@@ -38,7 +38,7 @@ public class MainUI extends JFrame{
 	private JTabbedPane floorTabbedPane;
 	
 	private String buildingName;
-	private String searchDate;
+	private Date searchDate;
 	private boolean isShowFree;
 	private String floorName;
 	
@@ -81,11 +81,11 @@ public class MainUI extends JFrame{
 	}
 	
 	private void placeDatePicker() {
-		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+//		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		datePicker = new JXDatePicker();
-		Date date = new Date();
-		searchDate = dateFormat.format(date);
-		datePicker.setDate(date);
+		searchDate = new Date();
+//		searchDate = dateFormat.format(date);
+//		datePicker.setDate(date);
 		datePicker.setBounds(330, 17, 150, 39);
 		panel_1.add(datePicker);
 		
@@ -97,9 +97,9 @@ public class MainUI extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				Date d = datePicker.getDate();
-				DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-				searchDate = dateFormat.format(d);
+				searchDate = datePicker.getDate();
+//				DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+//				searchDate = dateFormat.format(d);
 				//JOptionPane.showMessageDialog(panel_1, "获取控件中的日期 :" + d);
 			}
 		});
@@ -146,12 +146,28 @@ public class MainUI extends JFrame{
 		floorMapButton = new JButton("本楼层地图");
 		floorMapButton.setBounds(910, 17, 120, 39);
 		panel_1.add(floorMapButton);
+		floorMapButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				MapUI mapUI = new MapUI(buildingName, floorName);
+			}
+		});
 	}
 	
 	private void placeNoticeButton() {
 		noticeButton = new JButton("通知");
 		noticeButton.setBounds(1040, 17, 120, 39);
 		panel_1.add(noticeButton);
+		noticeButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				NoticeUI noticeUI = new NoticeUI();
+			}
+		});
 	}
 	
 	private void placeTabbedPane(String [] floorNames) {

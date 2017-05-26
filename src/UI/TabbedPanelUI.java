@@ -24,7 +24,7 @@ public class TabbedPanelUI extends Panel{
 			for (RoomInfo roomInfo : roomNameList) {
 				ArrayList<MeetingInfo> meetingList = dataController.getMeetingList(buildingName, 
 						floorName, roomInfo.getRoomName(), searchDate);
-				BlockUI roomBlock = new BlockUI(roomInfo.getRoomName(), roomInfo.getPersonNum(), 
+				BlockUI roomBlock = new BlockUI(searchDate, roomInfo.getRoomName(), roomInfo.getPersonNum(), 
 						roomInfo.getRoomSize(), roomInfo.getPosition(), meetingList);
 				this.add(roomBlock);
 			}
