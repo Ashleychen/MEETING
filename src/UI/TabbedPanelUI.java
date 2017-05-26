@@ -22,10 +22,10 @@ public class TabbedPanelUI extends Panel{
 		try {
 			ArrayList<RoomInfo> roomNameList = dataController.getRoomList(buildingName, floorName);
 			for (RoomInfo roomInfo : roomNameList) {
-				BlockUI roomBlock = new BlockUI(roomInfo.getRoomName(), roomInfo.getPersonNum(), 
-						roomInfo.getRoomSize(), roomInfo.getPosition());
 				ArrayList<MeetingInfo> meetingList = dataController.getMeetingList(buildingName, 
 						floorName, roomInfo.getRoomName(), searchDate);
+				BlockUI roomBlock = new BlockUI(roomInfo.getRoomName(), roomInfo.getPersonNum(), 
+						roomInfo.getRoomSize(), roomInfo.getPosition(), meetingList);
 				this.add(roomBlock);
 			}
 		} catch (SQLException e) {
