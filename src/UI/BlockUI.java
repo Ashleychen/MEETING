@@ -39,6 +39,7 @@ public class BlockUI extends JPanel {
 		Date lastTime = startTime;
 		for (MeetingInfo meetingInfo : meetingList) {
 			if (meetingInfo.getStartTime().compareTo(lastTime) > 0) {
+				BlockCellUI cellPanel = new BlockCellUI(lastTime, meetingInfo.getStartTime(), "", "", -1, lastTime, buildingName, floorName, roomName)
 				BlockCellUI cellPanel = new BlockCellUI(lastTime, meetingInfo.getStartTime(), "");
 				listPanel.add(cellPanel);
 				lastTime = meetingInfo.getStartTime();

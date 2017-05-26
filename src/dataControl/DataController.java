@@ -35,8 +35,22 @@ public class DataController {
 		dbConnection = DriverManager.getConnection(databaseURL, databaseUserName, databasePassword);
 	}
 	
+	public int getRoomId(String buildingName, String floorName, String roomName) throws SQLException {
+		String sql = "SELECT r_id FROM room WHERE region='" + buildingName + 
+			"' AND floor_name='" + floorName + "' AND room_name='" + roomName + "'";
+		Statement statement = dbConnection.createStatement();
+		ResultSet result = statement.executeQuery(sql);
+		result.first();
+		return result.getInt("r_id");
+	}
+	
 	//插入meeting信息
-	public int addMeetingRecord(String userName) {
+	public int addMeetingRecord(int uid, Date bookingStartTime, Date bookingendTime, int roomId, int personNum, String description) throws SQLException {
+		String sql = "INSERT INTO meeting (start_time, end_time, applicant_id, room_id, personNum, description) VALUES ('" +
+			bookingStartTime.toString() + "', '" + bookingendTime.toString() + "', '" + uid + "', '" + roomId + "', '" + 
+			personNum + "', '" + description + "')";
+		Statement statement = dbConnection.createStatement();
+		statement.executeQuery(sql);
 		return 0;
 	}
 	
@@ -57,8 +71,15 @@ public class DataController {
 		}
 		return 0;
 	}
+	public int getUId(String userName, String passWord) throws SQLException {
+		String sql = "SELECT * FROM users WHERE username='" + userName + "' AND password='" + passWord + "'";
+		Statement statement = dbConnection.createStatement();
+		ResultSet resultSet = statement.executeQuery(sql);
+		resultSet.first();
+		return resultSet.getInt("u_id");
+	}
 	
-	private int checkUser(String userName, String passWord) {
+	public int checkUser(String userName, String passWord) {
 		String sql = "SELECT * FROM users WHERE username='" + userName + "' AND password='" + passWord + "'";
 		Statement statement;
 		try {

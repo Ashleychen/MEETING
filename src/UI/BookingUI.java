@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -21,6 +22,8 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.JXDatePicker;
+
+import dataControl.DataController;
 
 public class BookingUI extends Panel{
 	private JLabel organizerNameLabel;
@@ -47,11 +50,24 @@ public class BookingUI extends Panel{
 	
 	private String topicText;
 	private int memberNum;
-	private Date bookingDate;
+	private Date bookingStartTime;
+	private Date bookingEndTime;
+	private String userName;
+	private String password;
+	private String buildingName;
+	private String floorName;
+	private String roomName;
 	
-	public BookingUI(String organizerName, int personNum, Date startDate) {
+	private DataController dataController;
+	
+	public BookingUI(String organizerName, String psw, int personNum, Date startDate,  String bn, String fn, String rn) {
 		super();
-		
+		dataController = new DataController();
+		userName = organizerName;
+		password = psw;
+		buildingName = bn;
+		floorName = fn;
+		roomName = rn;
 		organizerNameLabel = new JLabel("会议组织者");
 		organizerNameLabel.setBounds(10, 20, 80, 25);
 		this.add(organizerNameLabel);
@@ -99,14 +115,15 @@ public class BookingUI extends Panel{
 		int minMinute = 0;
 		int maxMinute = 59;
 		
-		Calendar day = Calendar.getInstance();
-		day.setTime(startDate);
-		day.set(Calendar.HOUR_OF_DAY, 0);
-		day.set(Calendar.MINUTE, 0);
-		day.set(Calendar.SECOND, 0);
-		bookingDate = day.getTime();
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(startDate);
+		calendar.set(Calendar.HOUR_OF_DAY, minHour);
+		calendar.set(Calendar.MINUTE, minMinute);
+		calendar.set(Calendar.SECOND, 0);
+		bookingStartTime = calendar.getTime();
+		bookingEndTime = calendar.getTime();
 		startDatePicker = new JXDatePicker();
-		startDatePicker.setDate(bookingDate);
+		startDatePicker.setDate(bookingStartTime);
 		startDatePicker.setBounds(100, 260, 118, 39);
 		this.add(startDatePicker);
 		
@@ -118,12 +135,13 @@ public class BookingUI extends Panel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				Calendar day = Calendar.getInstance();
-				day.setTime(startDatePicker.getDate());
-				day.set(Calendar.HOUR_OF_DAY, 0);
-				day.set(Calendar.MINUTE, 0);
-				day.set(Calendar.SECOND, 0);
-				bookingDate = day.getTime();
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(startDatePicker.getDate());
+				calendar.set(Calendar.HOUR_OF_DAY, minHour);
+				calendar.set(Calendar.MINUTE, minMinute);
+				calendar.set(Calendar.SECOND, 0);
+				bookingStartTime = calendar.getTime();
+				bookingEndTime = calendar.getTime();
 				//JOptionPane.showMessageDialog(this, "获取控件中的日期 :" + d);
 			}
 		});
@@ -143,7 +161,11 @@ public class BookingUI extends Panel{
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				// TODO Auto-generated method stub
-				
+				int startHour = (int)(e.getSource());
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(bookingStartTime);
+				calendar.set(Calendar.HOUR_OF_DAY, startHour);
+				bookingStartTime = calendar.getTime();
 			}
 		});
 		startHourLabel = new JLabel("时");
@@ -158,7 +180,11 @@ public class BookingUI extends Panel{
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				// TODO Auto-generated method stub
-				
+				int startMinute = (int)(e.getSource());
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(bookingStartTime);
+				calendar.set(Calendar.MINUTE, startMinute);
+				bookingStartTime = calendar.getTime();
 			}
 		});
 		startMinuteLabel = new JLabel("分");
@@ -177,7 +203,11 @@ public class BookingUI extends Panel{
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				// TODO Auto-generated method stub
-				
+				int endHour = (int)(e.getSource());
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(bookingEndTime);
+				calendar.set(Calendar.HOUR_OF_DAY, endHour);
+				bookingEndTime = calendar.getTime();
 			}
 		});
 		endHourLabel = new JLabel("时");
@@ -192,7 +222,11 @@ public class BookingUI extends Panel{
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				// TODO Auto-generated method stub
-				
+				int endMinute = (int)(e.getSource());
+				Calendar calendar = Calendar.getInstance();
+				calendar.setTime(bookingEndTime);
+				calendar.set(Calendar.MINUTE, endMinute);
+				bookingEndTime = calendar.getTime();
 			}
 		});
 		endMinuteLabel = new JLabel("分");
@@ -207,7 +241,20 @@ public class BookingUI extends Panel{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				
+				if (dataController.checkUser(userName, password) == 0) {
+					JOptionPane.showMessageDialog(null, "用户不存在");
+				} else if (bookingStartTime.compareTo(bookingEndTime) >= 0) {
+					JOptionPane.showMessageDialog(null, "预定时间设置错误");
+				} else {
+					try {
+						int uid = dataController.getUId(userName, password);
+						int roomId = dataController.getRoomId(buildingName, floorName, roomName);
+						dataController.addMeetingRecord(uid, bookingStartTime, bookingEndTime, roomId, memberNum, topicTextArea.getText());
+					} catch (SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
 			}
 		});
 	}
