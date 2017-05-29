@@ -11,7 +11,7 @@ public class RoomInfo {
 		roomName = rn;
 		personNum = pn;
 		roomSize = rs;
-		pos = position;
+		position = pos;
 	}
 	
 	public String getRoomName() {

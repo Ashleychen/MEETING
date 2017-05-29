@@ -1,13 +1,17 @@
 package UI;
 
+import java.awt.ScrollPane;
+import java.awt.dnd.DnDConstants;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 
@@ -20,6 +24,8 @@ import javax.swing.event.ChangeListener;
 
 import org.jdesktop.swingx.JXDatePicker;
 
+import dataControl.DataController;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -31,19 +37,26 @@ public class MainUI extends JFrame{
 	private JXDatePicker datePicker;
 	private JButton searchButton;
 	private JButton freeTimeButton;
-	private JButton freeRoomButton;
 	private JButton myMeetingButton;
 	private JButton floorMapButton;
 	private JButton noticeButton;
 	private JTabbedPane floorTabbedPane;
 	
+	private ArrayList<String> buildingNames;
 	private String buildingName;
 	private Date searchDate;
 	private boolean isShowFree;
 	private String floorName;
+	private int userID;
 	
-	public MainUI(String s) {
+	private DataController dataController;
+	
+	public MainUI(String s, int uid, String dbUserName, String dbPassword, String dbPort) throws SQLException, ClassNotFoundException {
 		super(s);
+		dataController = new DataController(dbUserName, dbPassword, dbPort);
+		userID = uid;
+		buildingNames = dataController.getBuildingNames();
+		buildingName = buildingNames.get(0);
 		this.setSize(1280, 1000);
 		this.setResizable(false);
 		this.addWindowListener(new WindowAdapter() {
@@ -52,19 +65,18 @@ public class MainUI extends JFrame{
 				System.exit(0);
 			}
 		});
-		this.initializeUI();
+		this.initializeUI(dbUserName, dbPassword, dbPort);
 		this.setVisible(true);
 	}
-	private void initializeUI() {
-		panel_1 = new JPanel();
-		this.placeComponents();
+	private void initializeUI(String dbUserName, String dbPassword, String dbPort) throws SQLException, ClassNotFoundException {
+		this.placeComponents(dbUserName, dbPassword, dbPort);
 		getContentPane().add(panel_1);
 	}
 	
-	private void placeComboBox(String[] buildingNames) {
-		buildingName = buildingNames[0];
+	private void placeComboBox() {
 		JComboBox comboBox = new JComboBox();
-		comboBox.setModel(new DefaultComboBoxModel(buildingNames));
+		String[] buildingNameArr = buildingNames.toArray(new String[buildingNames.size()]);
+		comboBox.setModel(new DefaultComboBoxModel(buildingNameArr));
 		comboBox.setBounds(106, 17, 150, 39);
 		panel_1.add(comboBox);
 		comboBox.addItemListener(new ItemListener() {
@@ -74,18 +86,17 @@ public class MainUI extends JFrame{
 				// TODO Auto-generated method stub
 				if (e.getStateChange() == ItemEvent.SELECTED) {
 					buildingName = e.getItem().toString();
-					System.out.println(buildingName);
 				}
 			}
 		});
 	}
 	
-	private void placeDatePicker() {
+	private void placeDatePicker(String dbUserName, String dbPassword, String dbPort) {
 //		DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		datePicker = new JXDatePicker();
 		searchDate = new Date();
 //		searchDate = dateFormat.format(date);
-//		datePicker.setDate(date);
+		datePicker.setDate(searchDate);
 		datePicker.setBounds(330, 17, 150, 39);
 		panel_1.add(datePicker);
 		
@@ -98,9 +109,20 @@ public class MainUI extends JFrame{
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
 				searchDate = datePicker.getDate();
-//				DateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
-//				searchDate = dateFormat.format(d);
-				//JOptionPane.showMessageDialog(panel_1, "获取控件中的日期 :" + d);
+				try {
+					floorTabbedPane.removeAll();
+					ArrayList<String> floorNames = dataController.getFloorNames(buildingName);
+					floorName = floorNames.get(0);
+					for (String floorName : floorNames) {
+						ScrollPane scrollPane = new ScrollPane();
+						scrollPane.add(new TabbedPanelUI(buildingName, floorName, searchDate, userID, isShowFree,
+								dbUserName, dbPassword, dbPort));
+						floorTabbedPane.addTab(floorName, scrollPane);
+					}
+				} catch (Exception e2) {
+					// TODO: handle exception
+					e2.printStackTrace();
+				}
 			}
 		});
 	}
@@ -115,7 +137,7 @@ public class MainUI extends JFrame{
 		panel_1.add(label_1);
 	}
 	
-	private void placeFreeTimeButton() {
+	private void placeFreeTimeButton(String dbUserName, String dbPassword, String dbPort) {
 		isShowFree =false;
 		freeTimeButton = new JButton("显示空闲时段");
 		freeTimeButton.setBounds(620, 17, 120, 39);
@@ -128,18 +150,49 @@ public class MainUI extends JFrame{
 				if (freeTimeButton.getText().equals("显示空闲时段")) {
 					isShowFree = true;
 					freeTimeButton.setText("显示全部时段");
+					try {
+						floorTabbedPane.removeAll();
+						placeTabbedPane(dbUserName, dbPassword, dbPort);
+					} catch (ClassNotFoundException | SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				} else if (freeTimeButton.getText().equals("显示全部时段")) {
 					isShowFree = false;
 					freeTimeButton.setText("显示空闲时段");
+					try {
+						floorTabbedPane.removeAll();
+						placeTabbedPane(dbUserName, dbPassword, dbPort);
+					} catch (ClassNotFoundException | SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
 			}
 		});
 	}
 	
-	private void placeMyMeetingButton() {
+	private void placeMyMeetingButton(String dbUserName, String dbPassword, String dbPort) {
 		myMeetingButton = new JButton("我的会议");
 		myMeetingButton.setBounds(780, 17, 120, 39);
 		panel_1.add(myMeetingButton);
+		myMeetingButton.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+				try {
+					String[] l = buildingNames.toArray(new String[buildingNames.size()]);
+					MyRecordUI myRecordUI = new MyRecordUI(searchDate, l, dbUserName, dbPassword, dbPort);
+				} catch (SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (ClassNotFoundException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		});
 	}
 	
 	private void placeFloorMapButton() {
@@ -156,7 +209,7 @@ public class MainUI extends JFrame{
 		});
 	}
 	
-	private void placeNoticeButton() {
+	private void placeNoticeButton(String dbUserName, String dbPassword, String dbPort) {
 		noticeButton = new JButton("通知");
 		noticeButton.setBounds(1040, 17, 120, 39);
 		panel_1.add(noticeButton);
@@ -165,39 +218,49 @@ public class MainUI extends JFrame{
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				// TODO Auto-generated method stub
-				NoticeUI noticeUI = new NoticeUI();
+				try {
+					NoticeUI noticeUI = new NoticeUI(dbUserName, dbPassword, dbPort);
+				} catch (ClassNotFoundException | SQLException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		});
 	}
-	
-	private void placeTabbedPane(String [] floorNames) {
-		floorName = floorNames[0];
+	private void initializeTabbedPane() {
 		floorTabbedPane = new JTabbedPane();
-		floorTabbedPane.setBounds(0, 60, 1280, 1000);
-		
+		floorTabbedPane.setBounds(0, 60, 1280, 940);	
 		panel_1.add(floorTabbedPane);
-		for (String string : floorNames) {
-			floorTabbedPane.addTab(string, new JPanel());
+	}
+	private void placeTabbedPane(String dbUserName, String dbPassword, String dbPort) throws SQLException, ClassNotFoundException {
+		ArrayList<String> floorNames = dataController.getFloorNames(buildingName);
+		floorName = floorNames.get(0);
+		for (String floorName : floorNames) {
+			ScrollPane scrollPane = new ScrollPane();
+			scrollPane.add(new TabbedPanelUI(buildingName, floorName, searchDate, userID, isShowFree,
+					dbUserName, dbPassword, dbPort));
+			floorTabbedPane.addTab(floorName, scrollPane);
 		}
 		floorTabbedPane.addChangeListener(new ChangeListener() {
 			
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				// TODO Auto-generated method stub
-				floorName = floorNames[floorTabbedPane.getSelectedIndex()];
-				System.out.println(floorName);
+//				floorName = floorNames.get(floorTabbedPane.getSelectedIndex());
 			}
 		});
 	}
-	private void placeComponents() {
+	private void placeComponents(String dbUserName, String dbPassword, String dbPort) throws SQLException, ClassNotFoundException {
+		panel_1 = new JPanel();
 		panel_1.setLayout(null);
-		placeComboBox(new String[] {"深圳国际", "科技园1号楼", "科技园2号楼", "科技园3号楼", "科技园4号楼", "科技园5号楼", "科技园6号楼", "总部", "上研大厦"});
-		placeDatePicker();
+		placeComboBox();
+		placeDatePicker(dbUserName, dbPassword, dbPort);
 		placeLabels();
-		placeFreeTimeButton();
-		placeTabbedPane(new String[] {"F7", "F8", "F9", "F10", "F11", "F16", "F17", "F18", "F19", "F20", "F21", "F22", "培训教室/视频会议室"});
+		placeFreeTimeButton(dbUserName, dbPassword, dbPort);
+		initializeTabbedPane();
+		placeTabbedPane(dbUserName, dbPassword, dbPort);
 		placeFloorMapButton();
-		placeNoticeButton();
-		placeMyMeetingButton();
+		placeNoticeButton(dbUserName, dbPassword, dbPort);
+		placeMyMeetingButton(dbUserName, dbPassword, dbPort);
 	}
 }
